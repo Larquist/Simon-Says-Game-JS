@@ -2,48 +2,55 @@ const buttonColours = ['red', 'blue', 'yellow', 'green'];
 let gamePattern = [];
 let userPattern = [];
 let level = 1;
+let gameActive = false;
+let sequence = 0;
 
 $(document).keypress(function() {
-    nextSequence();
+    if (!gameActive) {
+        nextSequence();
+        gameActive = true;
+    }
 });
 
 $('.btn').click(function(e) {
 
-    while ( userPattern.length < gamePattern.length ) {
-        // Set variable to id of btn clicked
-        let userChosenColour = e.target.id;
-        // Add colour to userPattern
-        userPattern.push(userChosenColour);
+    let pushedBtn = e.target.id;
+    userPattern.push(pushedBtn);
 
-        if (userPattern.forEach(n => {
-            if ( userPattern[n] != gamePattern[n] ) {
-                // Game Over
-                $('body').addClass('game-over');
-                playSound('wrong');
-    
-                console.log(userPattern, gamePattern);
-    
-                gamePattern = [];
-                userPattern = [];
-                level = 1;
-                $('#level-title').text('Press A Key to Start');
-    
-                return true;
-            }
-        })) {
-            break;
-        };
-        
+    buttonPush(pushedBtn);
 
-        playAnimation(userChosenColour);
-        playSound(userChosenColour);
 
+    for (let i = 0; i < userPattern.length; i++) {
+        if(userPattern[i] != gamePattern[i]){
+            gameOver();
+        }
+    }
+    
+    if (gameActive && (userPattern.length == gamePattern.length)) {
+        setTimeout(function() {
+            console.log(gameActive && userPattern.length == gamePattern.length)
+            nextSequence();
+        }, 200)
     }
 
-    nextSequence();
 })
 
+function gameOver() {
+    console.log(userPattern[userPattern.length - 1], gamePattern[userPattern.length - 1], userPattern[userPattern.length - 1] != gamePattern[userPattern.length - 1]);
+    $('body').addClass('game-over');
+    setTimeout(function() {
+        $('body').removeClass('game-over');
+    }, 100)
+
+    $('#level-title').text('Game Over, Press Any Key to Restart');
+    gamePattern = [];
+    userPattern = [];
+    gameActive = false;
+    level = 1;
+}
+
 function nextSequence () {
+    gameActive = true;
     // Set H1
     $('#level-title').text('Level ' + level);
     level += 1;
@@ -56,8 +63,13 @@ function nextSequence () {
     // Add random button to gamePattern array to keep track of button sequence
     gamePattern.push(randomColour);
 
-    playAnimation(randomColour);
-    playSound(randomColour);
+    buttonPush(randomColour);
+    userPattern = [];
+}
+
+function buttonPush(colour) {
+    playSound(colour);
+    playAnimation(colour);
 }
 
 function playSound(colour) {
