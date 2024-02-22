@@ -6,6 +6,7 @@ let gameActive = false;
 let sequence = 0;
 
 $(document).keypress(function() {
+    // Only respond to the keypress if the game is not active
     if (!gameActive) {
         nextSequence();
         gameActive = true;
@@ -15,20 +16,18 @@ $(document).keypress(function() {
 $('.btn').click(function(e) {
 
     let pushedBtn = e.target.id;
+    // Add the color of button to the userPattern array
     userPattern.push(pushedBtn);
-
     buttonPush(pushedBtn);
-
-
+    // Verify that the user selections match the game's pattern.
     for (let i = 0; i < userPattern.length; i++) {
         if(userPattern[i] != gamePattern[i]){
             gameOver();
         }
     }
-    
+    // Verify that the selection sequence is over by comparing length of both arrays
     if (gameActive && (userPattern.length == gamePattern.length)) {
         setTimeout(function() {
-            console.log(gameActive && userPattern.length == gamePattern.length)
             nextSequence();
         }, 200)
     }
@@ -36,13 +35,14 @@ $('.btn').click(function(e) {
 })
 
 function gameOver() {
-    console.log(userPattern[userPattern.length - 1], gamePattern[userPattern.length - 1], userPattern[userPattern.length - 1] != gamePattern[userPattern.length - 1]);
+    // Flash game-over style to body element
     $('body').addClass('game-over');
     setTimeout(function() {
         $('body').removeClass('game-over');
     }, 100)
 
     $('#level-title').text('Game Over, Press Any Key to Restart');
+    // Reset game
     gamePattern = [];
     userPattern = [];
     gameActive = false;
